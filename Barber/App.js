@@ -37,12 +37,18 @@ export default function App() {
         return;
       }
 
-      let location = await Location.getCurrentPositionAsync({});
-
-      console.log( {
-        latitude : location.coords.latitude,
-        longitude : location.coords.latitude
-      }, '<<<< ini gps');
+      // let location = await Location.getCurrentPositionAsync({});
+      let location = await Location.watchPositionAsync(
+        { enableHighAccuracy: true, distanceInterval: 10 },
+        (location) => {
+          // setLocation(location);
+          return location
+        }
+      );
+      // console.log( {
+      //   latitude : location.coords.latitude,
+      //   longitude : location.coords.latitude
+      // }, '<<<< ini gps');
       const docRef = doc(db, "Barbers", "1");
        await updateDoc(docRef, {
         location : {
@@ -50,6 +56,7 @@ export default function App() {
           longitude : location.coords.longitude
         }
       })
+
     })();
   }, []);
 
