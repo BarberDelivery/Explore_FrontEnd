@@ -30,6 +30,7 @@ export default function App() {
   const [errorMsg, setErrorMsg] = useState(null);
   const [position, setPosition] = useState("");
   useEffect(() => {
+
     
     const intervalId = setInterval(() => {
       // Code to be executed repeatedly
@@ -39,6 +40,7 @@ export default function App() {
           setErrorMsg("Permission to access location was denied");
           return;
         }
+
 
         // let location = await Location.getCurrentPositionAsync({});
         await Location.watchPositionAsync(
@@ -94,6 +96,7 @@ export default function App() {
   //         });
   //     } catch (err) {
 
+
   //     }
   //   })();
 
@@ -101,6 +104,7 @@ export default function App() {
   console.log(userLocation, "<<< user");
   const mapRef = useRef();
   // const {pickupCords, dropLocationCors} = state
+
   // const {}
   return (
     <View style={styles.container}>
