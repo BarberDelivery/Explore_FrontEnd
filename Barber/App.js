@@ -1,149 +1,25 @@
-import { StatusBar } from "expo-status-bar";
-import { useEffect, useRef, useState } from "react";
-import { StyleSheet, Text, View, Image } from "react-native";
-import MapView, { Marker } from "react-native-maps";
-import MapViewDirections from "react-native-maps-directions";
-import { GOOGLE_MAPS_APIKEY } from "./keyMap";
-import * as Location from "expo-location";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import Flag from "./components/Flag";
+import Maps from "./components/Maps";
 
-import db from "./config/firebase";
-import {
-  doc,
-  getDoc,
-  updateDoc,
-} from "firebase/firestore";
+const Stack = createNativeStackNavigator();
 
 export default function App() {
-  const [barberLocation, setBarberLocation] = useState({
-    latitude: 0,
-    longitude: 0,
-    latitudeDelta: 0.0922,
-    longitudeDelta: 0.0421,
-  });
-
-  const [userLocation, setUserLocation] = useState({
-    latitude: -6.175392,
-    latitudeDelta: 0.0922,
-    longitude: 106.827153,
-    longitudeDelta: 0.0421,
-  });
-  const [errorMsg, setErrorMsg] = useState(null);
-  const [position, setPosition] = useState("");
-  useEffect(() => {
-    
-    const intervalId = setInterval(() => {
-      // Code to be executed repeatedly
-      (async () => {
-        let { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== "granted") {
-          setErrorMsg("Permission to access location was denied");
-          return;
-        }
-
-        // let location = await Location.getCurrentPositionAsync({});
-        await Location.watchPositionAsync(
-          { enableHighAccuracy: true, timeInterval: 20 },
-          (location) => {
-            const docRef = doc(db, "Barbers", "1");
-            (async () => {
-              await updateDoc(docRef, {
-                location: {
-                  latitude: location.coords.latitude,
-                  longitude: location.coords.longitude,
-                },
-              });
-            })();
-          }
-        );
-      })();
-    }, 15000);
-
-    // Clear the interval when the component unmounts or when the dependencies change
-    return () => clearInterval(intervalId);
-  }, [barberLocation]);
-
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      // Code to be executed repeatedly
-      (async () => {
-        try {
-          const docRef = doc(db, "Barbers", "1");
-          const docSnap = await getDoc(docRef);
-          if (docSnap.exists()) {
-            console.log(docSnap.data());
-            setBarberLocation({
-              ...barberLocation,
-              latitude: docSnap.data().location.latitude,
-              longitude: docSnap.data().location.longitude,
-            });
-          } else {
-            console.log("No such document!");
-          }
-        } catch (err) {}
-      })();
-    }, 15000);
-
-    // Clear the interval when the component unmounts or when the dependencies change
-    return () => clearInterval(intervalId);
-  }, [barberLocation]);
-  // (async ()=>{
-  //     try {
-  //       const washingtonRef = doc(db, "Barbers", "1");
-  //         await updateDoc(washingtonRef, {
-  //           name: "yanto"
-  //         });
-  //     } catch (err) {
-
-  //     }
-  //   })();
-
-  console.log(barberLocation, "<<<< barber");
-  console.log(userLocation, "<<< user");
-  const mapRef = useRef();
-  // const {pickupCords, dropLocationCors} = state
-  // const {}
   return (
-    <View style={styles.container}>
-      <MapView
-        showsUserLocation={true}
-        ref={mapRef}
-        style={StyleSheet.absoluteFill}
-        initialRegion={barberLocation}
-      >
-        <Marker coordinate={barberLocation}>
-          <Image
-            source={{
-              uri: "https://cdn-icons-png.flaticon.com/512/1986/1986937.png",
-            }}
-            style={{ height: 35, width: 35 }}
-          />
-        </Marker>
-        <Marker coordinate={userLocation} />
-        <MapViewDirections
-          origin={barberLocation}
-          destination={userLocation}
-          apikey={GOOGLE_MAPS_APIKEY}
-          strokeWidth={3}
-          strokeColor="red"
-          optimizeWaypoints={true}
-          onReady={(result) => {
-            mapRef.current.fitToCoordinates(result.coordinates, {
-              edgePadding: {
-                right: 30,
-                botton: 300,
-                left: 30,
-                top: 100,
-              },
-            });
-          }}
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen
+          name="Maps"
+          options={{ headerShown: false }}
+          component={Maps}
         />
-      </MapView>
-    </View>
+        <Stack.Screen
+          name="Flags"
+          options={{ headerShown: false }}
+          component={Flag}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});
