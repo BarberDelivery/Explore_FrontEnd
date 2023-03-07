@@ -12,11 +12,6 @@ import db from "../config/firebase";
 import {
   doc,
   getDoc,
-  query,
-  where,
-  onSnapshot,
-  collection,
-  updateDoc,
   setDoc,
 } from "firebase/firestore";
 
@@ -120,7 +115,7 @@ export default function MapsPage({ navigation }) {
             console.log(err, "<<<<<<<");
           }
         })();
-      }, 5000);
+      }, 15000);
 
       return () => {
         console.log("pindagggg");
