@@ -38,24 +38,24 @@ export default function App() {
       }
 
       // let location = await Location.getCurrentPositionAsync({});
-      let location = await Location.watchPositionAsync(
+      await Location.watchPositionAsync(
         { enableHighAccuracy: true, distanceInterval: 10 },
         (location) => {
-          // setLocation(location);
-          return location
+          const docRef = doc(db, "Barbers", "1");
+          (async() => {
+            await updateDoc(docRef, {
+             location : {
+               latitude : location.coords.latitude,
+               longitude : location.coords.longitude
+             }
+           })
+          })()
         }
       );
       // console.log( {
       //   latitude : location.coords.latitude,
       //   longitude : location.coords.latitude
       // }, '<<<< ini gps');
-      const docRef = doc(db, "Barbers", "1");
-       await updateDoc(docRef, {
-        location : {
-          latitude : location.coords.latitude,
-          longitude : location.coords.longitude
-        }
-      })
 
     })();
   }, []);
@@ -95,7 +95,7 @@ export default function App() {
 //   })();
   
 
-  console.log(barberLocation, '<<<< barber');
+  console.log(barberLocation, '<<<< barbersssssss');
   console.log(userLocation, '<<< user');
     const mapRef = useRef()
     // const {pickupCords, dropLocationCors} = state
